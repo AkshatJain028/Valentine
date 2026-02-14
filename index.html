@@ -1,184 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Valentine Puzzle</title>
-    <style>
-        body {
-            margin: 0;
-            text-align: center;
-            background: linear-gradient(135deg, #f8e1e7, #f3c6d3);
-            font-family: "Georgia", serif;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<title>Valentine</title>
 
-        h1 {
-            margin-top: 30px;
-            font-size: 40px;
-            color: #7a2c45;
-            letter-spacing: 2px;
-        }
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f4d6dc, #e8c3cb);
+    font-family: 'Georgia', serif;
+}
 
-        .puzzle-container {
-            width: 480px;
-            height: 480px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            border: 3px solid #c9a227;
-            box-shadow: 0 0 25px rgba(0,0,0,0.15);
-        }
+.container {
+    text-align: center;
+}
 
-        .piece {
-            width: 60px;
-            height: 60px;
-            background-image: url("puzzle.jpg");
-            background-size: 480px 480px;
-            border: 1px solid rgba(255,255,255,0.6);
-            cursor: pointer;
-        }
+h1 {
+    color: #7b2d3b;
+    margin-bottom: 20px;
+}
 
-        button {
-            padding: 10px 24px;
-            font-size: 16px;
-            background: #7a2c45;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            margin: 8px;
-            transition: 0.3s;
-        }
+#puzzle {
+    width: 80vmin;
+    height: 80vmin;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    margin: auto;
+    border: 4px solid #7b2d3b;
+}
 
-        button:hover {
-            background: #5e1f34;
-        }
+.piece {
+    background-image: url("puzzle.jpg");
+    background-size: 800% 800%;
+    cursor: grab;
+}
 
-        #popup {
-            opacity: 0;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            font-size: 32px;
-            color: #7a2c45;
-            box-shadow: 0 0 40px rgba(0,0,0,0.2);
-            transition: opacity 1.5s ease;
-            z-index: 1000;
-        }
+.buttons {
+    margin-top: 20px;
+}
 
-        .confetti {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: gold;
-            animation: fall 4s linear forwards;
-        }
+button {
+    background: #7b2d3b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
 
-        @keyframes fall {
-            from { transform: translateY(-10vh); opacity: 1; }
-            to { transform: translateY(100vh); opacity: 0; }
-        }
-    </style>
+button:hover {
+    background: #5e1f2a;
+}
+
+#popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    font-size: 24px;
+    color: #7b2d3b;
+}
+</style>
 </head>
 
 <body>
 
-<h1>Happy Valentine’s Day</h1>
+<div class="container">
+    <h1>Happy Valentine’s Day</h1>
+    <div id="puzzle"></div>
 
-<div class="puzzle-container" id="puzzle"></div>
+    <div class="buttons">
+        <button onclick="shuffle()">Shuffle</button>
+        <button onclick="restart()">Restart</button>
+    </div>
+</div>
 
-<button onclick="shuffle()">Shuffle</button>
-<button onclick="restartPuzzle()">Restart</button>
-
-<div id="popup">I Love You Muffin ❤️</div>
+<div id="popup">
+    <div class="popup-content">
+        I Love You Muffin ❤️
+    </div>
+</div>
 
 <script>
-    const size = 8;
-    const puzzle = document.getElementById("puzzle");
-    const popup = document.getElementById("popup");
-    let pieces = [];
-    let selectedPiece = null;
+const puzzle = document.getElementById("puzzle");
+let pieces = [];
+let dragged = null;
 
-    function createPuzzle() {
-        puzzle.innerHTML = "";
-        pieces = [];
+function createPuzzle() {
+    puzzle.innerHTML = "";
+    pieces = [];
 
-        for (let row = 0; row < size; row++) {
-            for (let col = 0; col < size; col++) {
-                const piece = document.createElement("div");
-                piece.classList.add("piece");
-                piece.style.backgroundPosition = `-${col * 60}px -${row * 60}px`;
-                piece.dataset.correct = row * size + col;
-                piece.addEventListener("click", () => selectPiece(piece));
-                pieces.push(piece);
-                puzzle.appendChild(piece);
-            }
-        }
+    for (let i = 0; i < 64; i++) {
+        const piece = document.createElement("div");
+        piece.classList.add("piece");
+        piece.draggable = true;
+
+        const x = i % 8;
+        const y = Math.floor(i / 8);
+
+        piece.style.backgroundPosition = `${x * 100/7}% ${y * 100/7}%`;
+        piece.dataset.index = i;
+
+        piece.addEventListener("dragstart", dragStart);
+        piece.addEventListener("dragover", dragOver);
+        piece.addEventListener("drop", drop);
+
+        pieces.push(piece);
+        puzzle.appendChild(piece);
     }
+}
 
-    function selectPiece(piece) {
-        if (!selectedPiece) {
-            selectedPiece = piece;
-            piece.style.border = "2px solid #c9a227";
-        } else {
-            swapPieces(selectedPiece, piece);
-            selectedPiece.style.border = "1px solid rgba(255,255,255,0.6)";
-            selectedPiece = null;
-            checkWin();
-        }
-    }
+function dragStart(e) {
+    dragged = e.target;
+}
 
-    function swapPieces(p1, p2) {
-        const temp = p1.style.backgroundPosition;
-        p1.style.backgroundPosition = p2.style.backgroundPosition;
-        p2.style.backgroundPosition = temp;
-    }
+function dragOver(e) {
+    e.preventDefault();
+}
 
-    function shuffle() {
-        for (let i = pieces.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            swapPieces(pieces[i], pieces[j]);
-        }
-        popup.style.opacity = "0";
-    }
+function drop(e) {
+    if (dragged === e.target) return;
 
-    function checkWin() {
-        let correct = true;
-        pieces.forEach((piece, index) => {
-            if (piece.dataset.correct != index) {
-                correct = false;
-            }
-        });
+    let temp = dragged.style.backgroundPosition;
+    dragged.style.backgroundPosition = e.target.style.backgroundPosition;
+    e.target.style.backgroundPosition = temp;
 
-        if (correct) {
-            popup.style.opacity = "1";
-            launchConfetti();
-        }
-    }
+    checkWin();
+}
 
-    function restartPuzzle() {
-        createPuzzle();
-        shuffle();
-    }
+function shuffle() {
+    pieces.forEach(piece => {
+        const randX = Math.floor(Math.random() * 8);
+        const randY = Math.floor(Math.random() * 8);
+        piece.style.backgroundPosition = `${randX * 100/7}% ${randY * 100/7}%`;
+    });
+}
 
-    function launchConfetti() {
-        for (let i = 0; i < 80; i++) {
-            const confetti = document.createElement("div");
-            confetti.classList.add("confetti");
-            confetti.style.left = Math.random() * 100 + "vw";
-            confetti.style.animationDuration =
-                (Math.random() * 2 + 2) + "s";
-            document.body.appendChild(confetti);
-            setTimeout(() => confetti.remove(), 4000);
-        }
-    }
-
+function restart() {
     createPuzzle();
-    shuffle();
+}
+
+function checkWin() {
+    let correct = true;
+
+    pieces.forEach((piece, i) => {
+        const x = i % 8;
+        const y = Math.floor(i / 8);
+        const correctPos = `${x * 100/7}% ${y * 100/7}%`;
+
+        if (piece.style.backgroundPosition !== correctPos) {
+            correct = false;
+        }
+    });
+
+    if (correct) {
+        document.getElementById("popup").style.display = "flex";
+    }
+}
+
+createPuzzle();
 </script>
 
 </body>
