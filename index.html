@@ -116,7 +116,7 @@ function createPuzzle() {
     } else {
       const row = Math.floor(i / size);
       const col = i % size;
-      tile.style.backgroundImage = "url('images/your-image.jpg')";
+      tile.style.backgroundImage = "url('images/puzzle.jpg')";
       tile.style.backgroundPosition = `-${col * 120}px -${row * 120}px`;
       tile.addEventListener("click", () => moveTile(i));
     }
