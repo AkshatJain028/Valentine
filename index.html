@@ -2,51 +2,64 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Valentine</title>
+<title>Love Story</title>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 body {
     margin: 0;
     font-family: 'Georgia', serif;
-    background: #f8cfd6;
+    background: linear-gradient(#f7b6c2, #f8d7dc);
     text-align: center;
+    color: #7b2d3b;
     overflow-x: hidden;
 }
 
-/* Top Romantic Banner */
+/* Floating background hearts */
+body::before {
+    content: "❤️ 🌸 💖 🌹 ❤️ 💕 🌺 💝 ❤️";
+    position: fixed;
+    font-size: 40px;
+    opacity: 0.08;
+    width: 200%;
+    animation: float 25s linear infinite;
+}
+
+@keyframes float {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-100vh); }
+}
+
+/* Top Banner */
 .banner {
     padding: 30px 10px 10px;
-    background: linear-gradient(to bottom, #f6a9b8, #f8cfd6);
-    color: white;
 }
 
 .banner h1 {
-    font-size: 48px;
+    font-size: 56px;
     margin: 0;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
 }
 
 .subtitle {
-    font-size: 22px;
+    font-size: 24px;
+    color: white;
     margin-top: 10px;
 }
 
-/* Puzzle Section */
-.puzzle-wrapper {
-    padding: 20px;
-}
-
+/* Puzzle */
 #puzzle {
-    margin: 20px auto;
+    margin: 30px auto;
     width: 70vmin;
     height: 84vmin;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    border: 6px solid #ffffffaa;
-    border-radius: 15px;
+    border: 6px solid white;
+    border-radius: 20px;
     background: white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
 }
 
 .piece {
@@ -55,23 +68,24 @@ body {
     cursor: grab;
 }
 
-/* Bottom Message Section */
-.message-section {
-    padding: 20px 10px 40px;
+/* Completion Text */
+.complete-text {
+    font-size: 32px;
+    margin-top: 10px;
+    color: #b03060;
 }
 
 .big-message {
-    font-size: 40px;
-    color: #b03060;
-    margin-bottom: 10px;
+    font-size: 44px;
+    margin-top: 10px;
 }
 
 .small-sub {
-    font-size: 20px;
+    font-size: 22px;
     margin-bottom: 20px;
-    color: #7b2d3b;
 }
 
+/* Button */
 button {
     padding: 15px 40px;
     font-size: 20px;
@@ -80,11 +94,25 @@ button {
     border: none;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
 }
 
 button:hover {
     background: #b03060;
+}
+
+/* Bottom romantic footer */
+.footer {
+    padding: 30px 10px;
+    background: linear-gradient(to top, #f6a9b8, #f8d7dc);
+    color: white;
+    font-size: 28px;
+}
+
+.footer small {
+    display: block;
+    font-size: 20px;
+    margin-top: 10px;
 }
 
 /* Popup */
@@ -101,7 +129,7 @@ button:hover {
     background: white;
     padding: 50px;
     border-radius: 20px;
-    font-size: 30px;
+    font-size: 32px;
     color: #b03060;
 }
 </style>
@@ -114,14 +142,18 @@ button:hover {
     <div class="subtitle">Welcome to Our Love Story!</div>
 </div>
 
-<div class="puzzle-wrapper">
-    <div id="puzzle"></div>
-</div>
+<div id="puzzle"></div>
 
-<div class="message-section">
-    <div class="big-message">You Complete Me!</div>
-    <div class="small-sub">Our Sweet Jigsaw Moment</div>
-    <button onclick="shuffle()">Shuffle Puzzle</button>
+<div class="complete-text">Puzzle Complete!</div>
+
+<div class="big-message">You Complete Me!</div>
+<div class="small-sub">Our Sweet Jigsaw Moment</div>
+
+<button onclick="shuffle()">Shuffle Puzzle</button>
+
+<div class="footer">
+    Forever & Always
+    <small>With You, My Heart is Home</small>
 </div>
 
 <div id="popup">
@@ -179,6 +211,8 @@ function shuffle() {
     pieces.forEach((piece, index) => {
         piece.style.backgroundPosition = positions[index];
     });
+
+    document.getElementById("popup").style.display = "none";
 }
 
 function dragStart(e) {
