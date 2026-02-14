@@ -7,48 +7,52 @@
 <style>
 body {
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #f8e1e7, #f3cfd6);
+    font-family: 'Georgia', serif;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    padding: 30px 10px 10px 10px;
+}
+
+.header h1 {
+    font-size: 42px;
+    color: #7b2d3b;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+/* Romantic GIF Row */
+.gif-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.gif-row img {
+    width: 60px;
+    height: 60px;
+}
+
+/* PUZZLE AREA */
+.main {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #f8e1e7, #f3cfd6);
-    font-family: 'Georgia', serif;
-    overflow: hidden;
-}
-
-/* Soft floating hearts */
-body::before {
-    content: "❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤";
-    position: absolute;
-    font-size: 40px;
-    opacity: 0.05;
-    width: 200%;
-    animation: float 25s linear infinite;
-}
-
-@keyframes float {
-    from { transform: translateY(100vh); }
-    to { transform: translateY(-100vh); }
-}
-
-.container {
-    text-align: center;
-    z-index: 2;
-}
-
-h1 {
-    color: #7b2d3b;
-    margin-bottom: 20px;
-    letter-spacing: 2px;
 }
 
 #puzzle {
     width: 70vmin;
-    height: 84vmin; /* 5x6 ratio */
+    height: 84vmin;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    margin: auto;
     border: 4px solid #7b2d3b;
     background: white;
 }
@@ -59,26 +63,27 @@ h1 {
     cursor: grab;
 }
 
-.buttons {
-    margin-top: 20px;
+/* FOOTER BUTTON */
+.footer {
+    padding: 20px;
 }
 
 button {
+    width: 100%;
+    padding: 20px;
+    font-size: 18px;
     background: #7b2d3b;
     color: white;
     border: none;
-    padding: 10px 22px;
-    margin: 5px;
-    border-radius: 25px;
-    font-size: 14px;
+    border-radius: 30px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 button:hover {
     background: #5e1f2a;
 }
 
+/* POPUP */
 #popup {
     position: fixed;
     inset: 0;
@@ -92,28 +97,29 @@ button:hover {
     background: white;
     padding: 40px;
     border-radius: 15px;
-    font-size: 26px;
+    font-size: 28px;
     color: #7b2d3b;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="header">
     <h1>Happy Valentine’s Day</h1>
-    <div id="puzzle"></div>
-
-    <div class="buttons">
-        <button onclick="shuffle()">Shuffle</button>
-        <button onclick="restart()">Restart</button>
+    <div class="gif-row">
+        <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
+        <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">
+        <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif">
     </div>
+</div>
+
+<div class="main">
+    <div id="puzzle"></div>
+</div>
+
+<div class="footer">
+    <button onclick="shuffle()">Shuffle Puzzle</button>
 </div>
 
 <div id="popup">
@@ -143,7 +149,9 @@ function createPuzzle() {
         const x = i % cols;
         const y = Math.floor(i / cols);
 
-        piece.style.backgroundPosition = `${(x * 100)/(cols-1)}% ${(y * 100)/(rows-1)}%`;
+        piece.style.backgroundPosition =
+            `${(x * 100)/(cols-1)}% ${(y * 100)/(rows-1)}%`;
+
         piece.dataset.correct = piece.style.backgroundPosition;
 
         piece.addEventListener("dragstart", dragStart);
@@ -154,7 +162,7 @@ function createPuzzle() {
         puzzle.appendChild(piece);
     }
 
-    shuffle(); // 🔥 Shuffle automatically on load
+    shuffle();
 }
 
 function dragStart(e) {
@@ -182,10 +190,6 @@ function shuffle() {
         piece.style.backgroundPosition =
             `${(randX * 100)/(cols-1)}% ${(randY * 100)/(rows-1)}%`;
     });
-}
-
-function restart() {
-    createPuzzle();
 }
 
 function checkWin() {
