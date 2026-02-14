@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Happy Valentine's Day ❤️</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
 body {
   margin: 0;
@@ -39,23 +37,28 @@ h1 {
   width: 360px;
   height: 360px;
   margin: 20px auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 2px;
+  position: relative;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .tile {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  background-image: url('images/puzzle.jpg');
   background-size: 360px 360px;
   cursor: pointer;
+  box-sizing: border-box;
+  border: 1px solid #fff;
+  transition: all 0.2s ease;
 }
 
 .empty {
   background: white;
   cursor: default;
+  border: none;
 }
 
 button {
@@ -82,7 +85,6 @@ button:hover {
 }
 </style>
 </head>
-
 <body>
 
 <h1>Happy Valentine's Day ❤️</h1>
@@ -99,53 +101,65 @@ button:hover {
 </div>
 
 <script>
-const puzzle = document.getElementById("puzzle");
+const puzzle = document.getElementById('puzzle');
 const size = 3;
+const tileSize = 120;
 let tiles = [];
+let emptyPos = {x: size-1, y: size-1};
 
 function createPuzzle() {
-  puzzle.innerHTML = "";
   tiles = [];
+  puzzle.innerHTML = '';
 
-  for (let i = 0; i < size * size; i++) {
-    const tile = document.createElement("div");
-    tile.classList.add("tile");
+  for(let row=0; row<size; row++){
+    for(let col=0; col<size; col++){
+      if(row === size-1 && col === size-1) continue; // skip last tile
 
-    if (i === size * size - 1) {
-      tile.classList.add("empty");
-    } else {
-      const row = Math.floor(i / size);
-      const col = i % size;
-      tile.style.backgroundImage = "url('images/puzzle.jpg')";
-      tile.style.backgroundPosition = `-${col * 120}px -${row * 120}px`;
-      tile.addEventListener("click", () => moveTile(i));
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      tile.style.left = `${col*tileSize}px`;
+      tile.style.top = `${row*tileSize}px`;
+      tile.style.backgroundPosition = `-${col*tileSize}px -${row*tileSize}px`;
+
+      tile.dataset.row = row;
+      tile.dataset.col = col;
+
+      tile.addEventListener('click', ()=> moveTile(tile));
+
+      puzzle.appendChild(tile);
+      tiles.push(tile);
     }
-
-    tiles.push(tile);
-    puzzle.appendChild(tile);
   }
 }
 
-function moveTile(index) {
-  const emptyIndex = tiles.findIndex(t => t.classList.contains("empty"));
-  const validMoves = [
-    emptyIndex - 1,
-    emptyIndex + 1,
-    emptyIndex - size,
-    emptyIndex + size
-  ];
+function moveTile(tile) {
+  const tileRow = parseInt(tile.dataset.row);
+  const tileCol = parseInt(tile.dataset.col);
 
-  if (validMoves.includes(index)) {
-    puzzle.insertBefore(tiles[index], tiles[emptyIndex]);
-    tiles.splice(emptyIndex, 1);
-    tiles.splice(index, 0, document.querySelector(".empty"));
+  // check if adjacent to empty
+  if((tileRow === emptyPos.y && Math.abs(tileCol - emptyPos.x)===1) ||
+     (tileCol === emptyPos.x && Math.abs(tileRow - emptyPos.y)===1)) {
+
+    const tempLeft = tile.style.left;
+    const tempTop = tile.style.top;
+
+    tile.style.left = `${emptyPos.x*tileSize}px`;
+    tile.style.top = `${emptyPos.y*tileSize}px`;
+
+    emptyPos.x = tileCol;
+    emptyPos.y = tileRow;
   }
 }
 
 function shuffle() {
-  for (let i = 0; i < 100; i++) {
-    const rand = Math.floor(Math.random() * tiles.length);
-    moveTile(rand);
+  for(let i=0; i<100; i++){
+    const movable = tiles.filter(t=>{
+      const r = parseInt(t.dataset.row);
+      const c = parseInt(t.dataset.col);
+      return (r === emptyPos.y && Math.abs(c-emptyPos.x)===1) || (c===emptyPos.x && Math.abs(r-emptyPos.y)===1);
+    });
+    const tile = movable[Math.floor(Math.random()*movable.length)];
+    moveTile(tile);
   }
 }
 
