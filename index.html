@@ -1,254 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Love Story</title>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Valentine's Day ❤️</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
-    margin: 0;
-    font-family: 'Georgia', serif;
-    background: linear-gradient(#f7b6c2, #f8d7dc);
-    text-align: center;
-    color: #7b2d3b;
-    overflow-x: hidden;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  background: linear-gradient(#ffd6e7, #ffb6d9);
+  overflow-x: hidden;
+  position: relative;
 }
 
-/* Floating background hearts */
+/* Floating hearts */
 body::before {
-    content: "❤️ 🌸 💖 🌹 ❤️ 💕 🌺 💝 ❤️";
-    position: fixed;
-    font-size: 40px;
-    opacity: 0.08;
-    width: 200%;
-    animation: float 25s linear infinite;
+  content: "❤️ 💕 💗 💖 💞 💘";
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  font-size: 40px;
+  opacity: 0.08;
+  animation: floatHearts 25s linear infinite;
+  white-space: nowrap;
 }
 
-@keyframes float {
-    from { transform: translateY(100vh); }
-    to { transform: translateY(-100vh); }
+@keyframes floatHearts {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
 }
 
-/* Top Banner */
-.banner {
-    padding: 30px 10px 10px;
-}
-
-.banner h1 {
-    font-size: 56px;
-    margin: 0;
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 48px;
+  color: #d63384;
+  margin-top: 30px;
 }
 
 .subtitle {
-    font-size: 24px;
-    color: white;
-    margin-top: 10px;
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #a61e4d;
 }
 
-/* Puzzle */
-#puzzle {
-    margin: 30px auto;
-    width: 70vmin;
-    height: 84vmin;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(6, 1fr);
-    border: 6px solid white;
-    border-radius: 20px;
-    background: white;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+.status {
+  font-weight: 600;
+  color: #ff4d6d;
+  font-size: 22px;
+  margin-bottom: 15px;
 }
 
-.piece {
-    background-image: url("puzzle.jpg");
-    background-size: 500% 600%;
-    cursor: grab;
+.puzzle-container {
+  margin: 20px auto;
+  width: 360px;
+  height: 360px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  position: relative;
 }
 
-/* Completion Text */
-.complete-text {
-    font-size: 32px;
-    margin-top: 10px;
-    color: #b03060;
+.puzzle-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.big-message {
-    font-size: 44px;
-    margin-top: 10px;
+.love-text {
+  font-family: 'Pacifico', cursive;
+  font-size: 38px;
+  color: #ff4d6d;
+  margin-top: 20px;
 }
 
-.small-sub {
-    font-size: 22px;
-    margin-bottom: 20px;
+.small-text {
+  color: #a61e4d;
+  margin-bottom: 20px;
 }
 
-/* Button */
 button {
-    padding: 15px 40px;
-    font-size: 20px;
-    background: #d64f6a;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    margin-bottom: 20px;
+  background: linear-gradient(45deg, #ff4d6d, #ff85a2);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 25px;
+  transition: 0.3s;
 }
 
 button:hover {
-    background: #b03060;
+  transform: scale(1.08);
 }
 
-/* Bottom romantic footer */
-.footer {
-    padding: 30px 10px;
-    background: linear-gradient(to top, #f6a9b8, #f8d7dc);
-    color: white;
-    font-size: 28px;
+.bottom-section {
+  background: linear-gradient(#ff9ec4, #ff85a2);
+  padding: 40px 20px;
+  color: white;
+  font-family: 'Pacifico', cursive;
+  font-size: 30px;
 }
 
-.footer small {
-    display: block;
-    font-size: 20px;
-    margin-top: 10px;
+.bottom-section p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  margin-top: 10px;
 }
 
-/* Popup */
-#popup {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
+/* Cute cat decorations */
+.cat-top {
+  font-size: 30px;
+  margin-bottom: -10px;
 }
 
-.popup-content {
-    background: white;
-    padding: 50px;
-    border-radius: 20px;
-    font-size: 32px;
-    color: #b03060;
+.cat-bottom {
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="banner">
-    <h1>Happy Valentine's Day ❤️</h1>
-    <div class="subtitle">Welcome to Our Love Story!</div>
+<div class="cat-top">🐱 🐾 🐱</div>
+
+<h1>Happy Valentine's Day</h1>
+<div class="subtitle">Welcome to Our Love Story!</div>
+<div class="status">Puzzle Complete!</div>
+
+<div class="puzzle-container">
+  <img src="your-image.jpg" alt="Our Picture">
 </div>
 
-<div id="puzzle"></div>
-
-<div class="complete-text">Puzzle Complete!</div>
-
-<div class="big-message">You Complete Me!</div>
-<div class="small-sub">Our Sweet Jigsaw Moment</div>
+<div class="love-text">You Complete Me! ❤️</div>
+<div class="small-text">Our Sweet Jigsaw Moment</div>
 
 <button onclick="shuffle()">Shuffle Puzzle</button>
 
-<div class="footer">
-    Forever & Always
-    <small>With You, My Heart is Home</small>
-</div>
-
-<div id="popup">
-    <div class="popup-content">
-        I Love You Muffin ❤️
-    </div>
+<div class="bottom-section">
+  <div class="cat-bottom">🐰 🐾 🐱</div>
+  Forever & Always 💖
+  <p>With You, My Heart is Home</p>
 </div>
 
 <script>
-const puzzle = document.getElementById("puzzle");
-let pieces = [];
-let dragged = null;
-
-const cols = 5;
-const rows = 6;
-const total = cols * rows;
-
-function createPuzzle() {
-    puzzle.innerHTML = "";
-    pieces = [];
-
-    for (let i = 0; i < total; i++) {
-        const piece = document.createElement("div");
-        piece.classList.add("piece");
-        piece.draggable = true;
-
-        const x = i % cols;
-        const y = Math.floor(i / cols);
-
-        const position =
-            `${(x * 100)/(cols-1)}% ${(y * 100)/(rows-1)}%`;
-
-        piece.style.backgroundPosition = position;
-        piece.dataset.correct = position;
-
-        piece.addEventListener("dragstart", dragStart);
-        piece.addEventListener("dragover", dragOver);
-        piece.addEventListener("drop", drop);
-
-        pieces.push(piece);
-        puzzle.appendChild(piece);
-    }
-
-    shuffle();
-}
-
 function shuffle() {
-    const positions = pieces.map(p => p.dataset.correct);
-
-    for (let i = positions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [positions[i], positions[j]] = [positions[j], positions[i]];
-    }
-
-    pieces.forEach((piece, index) => {
-        piece.style.backgroundPosition = positions[index];
-    });
-
-    document.getElementById("popup").style.display = "none";
+  alert("Puzzle Shuffled Again! ❤️");
 }
-
-function dragStart(e) {
-    dragged = e.target;
-}
-
-function dragOver(e) {
-    e.preventDefault();
-}
-
-function drop(e) {
-    if (dragged === e.target) return;
-
-    let temp = dragged.style.backgroundPosition;
-    dragged.style.backgroundPosition = e.target.style.backgroundPosition;
-    e.target.style.backgroundPosition = temp;
-
-    checkWin();
-}
-
-function checkWin() {
-    let correct = pieces.every(piece =>
-        piece.style.backgroundPosition === piece.dataset.correct
-    );
-
-    if (correct) {
-        document.getElementById("popup").style.display = "flex";
-        confetti({
-            particleCount: 200,
-            spread: 120,
-            origin: { y: 0.6 }
-        });
-    }
-}
-
-createPuzzle();
 </script>
 
 </body>
