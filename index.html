@@ -11,32 +11,51 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #f4d6dc, #e8c3cb);
+    background: linear-gradient(135deg, #f8e1e7, #f3cfd6);
     font-family: 'Georgia', serif;
+    overflow: hidden;
+}
+
+/* Soft floating hearts */
+body::before {
+    content: "❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤";
+    position: absolute;
+    font-size: 40px;
+    opacity: 0.05;
+    width: 200%;
+    animation: float 25s linear infinite;
+}
+
+@keyframes float {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-100vh); }
 }
 
 .container {
     text-align: center;
+    z-index: 2;
 }
 
 h1 {
     color: #7b2d3b;
     margin-bottom: 20px;
+    letter-spacing: 2px;
 }
 
 #puzzle {
-    width: 80vmin;
-    height: 80vmin;
+    width: 70vmin;
+    height: 84vmin; /* 5x6 ratio */
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(6, 1fr);
     margin: auto;
     border: 4px solid #7b2d3b;
+    background: white;
 }
 
 .piece {
     background-image: url("puzzle.jpg");
-    background-size: 800% 800%;
+    background-size: 500% 600%;
     cursor: grab;
 }
 
@@ -48,11 +67,12 @@ button {
     background: #7b2d3b;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 22px;
     margin: 5px;
-    border-radius: 20px;
+    border-radius: 25px;
     font-size: 14px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 button:hover {
@@ -70,10 +90,16 @@ button:hover {
 
 .popup-content {
     background: white;
-    padding: 30px;
-    border-radius: 10px;
-    font-size: 24px;
+    padding: 40px;
+    border-radius: 15px;
+    font-size: 26px;
     color: #7b2d3b;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 </style>
 </head>
@@ -101,20 +127,24 @@ const puzzle = document.getElementById("puzzle");
 let pieces = [];
 let dragged = null;
 
+const cols = 5;
+const rows = 6;
+const total = cols * rows;
+
 function createPuzzle() {
     puzzle.innerHTML = "";
     pieces = [];
 
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < total; i++) {
         const piece = document.createElement("div");
         piece.classList.add("piece");
         piece.draggable = true;
 
-        const x = i % 8;
-        const y = Math.floor(i / 8);
+        const x = i % cols;
+        const y = Math.floor(i / cols);
 
-        piece.style.backgroundPosition = `${x * 100/7}% ${y * 100/7}%`;
-        piece.dataset.index = i;
+        piece.style.backgroundPosition = `${(x * 100)/(cols-1)}% ${(y * 100)/(rows-1)}%`;
+        piece.dataset.correct = piece.style.backgroundPosition;
 
         piece.addEventListener("dragstart", dragStart);
         piece.addEventListener("dragover", dragOver);
@@ -123,6 +153,8 @@ function createPuzzle() {
         pieces.push(piece);
         puzzle.appendChild(piece);
     }
+
+    shuffle(); // 🔥 Shuffle automatically on load
 }
 
 function dragStart(e) {
@@ -145,9 +177,10 @@ function drop(e) {
 
 function shuffle() {
     pieces.forEach(piece => {
-        const randX = Math.floor(Math.random() * 8);
-        const randY = Math.floor(Math.random() * 8);
-        piece.style.backgroundPosition = `${randX * 100/7}% ${randY * 100/7}%`;
+        const randX = Math.floor(Math.random() * cols);
+        const randY = Math.floor(Math.random() * rows);
+        piece.style.backgroundPosition =
+            `${(randX * 100)/(cols-1)}% ${(randY * 100)/(rows-1)}%`;
     });
 }
 
@@ -158,12 +191,8 @@ function restart() {
 function checkWin() {
     let correct = true;
 
-    pieces.forEach((piece, i) => {
-        const x = i % 8;
-        const y = Math.floor(i / 8);
-        const correctPos = `${x * 100/7}% ${y * 100/7}%`;
-
-        if (piece.style.backgroundPosition !== correctPos) {
+    pieces.forEach(piece => {
+        if (piece.style.backgroundPosition !== piece.dataset.correct) {
             correct = false;
         }
     });
