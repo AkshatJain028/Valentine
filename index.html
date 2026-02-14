@@ -3,88 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <title>Valentine</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
 body {
     margin: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(135deg, #f8e1e7, #f3cfd6);
     font-family: 'Georgia', serif;
-    overflow: hidden;
-}
-
-/* HEADER */
-.header {
+    background: #f8cfd6;
     text-align: center;
-    padding-top: 25px;
+    overflow-x: hidden;
 }
 
-.header h1 {
-    font-size: 44px;
-    color: #7b2d3b;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+/* Top Romantic Banner */
+.banner {
+    padding: 30px 10px 10px;
+    background: linear-gradient(to bottom, #f6a9b8, #f8cfd6);
+    color: white;
 }
 
-/* Floating Stickers */
-.sticker {
-    position: absolute;
-    font-size: 28px;
-    opacity: 0.8;
+.banner h1 {
+    font-size: 48px;
+    margin: 0;
 }
 
-.sticker1 { top: 20px; left: 20px; }
-.sticker2 { top: 60px; right: 30px; }
-.sticker3 { top: 140px; left: 40px; }
-.sticker4 { top: 120px; right: 50px; }
-.sticker5 { bottom: 120px; left: 30px; }
-.sticker6 { bottom: 140px; right: 40px; }
+.subtitle {
+    font-size: 22px;
+    margin-top: 10px;
+}
 
-/* MAIN */
-.main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Puzzle Section */
+.puzzle-wrapper {
+    padding: 20px;
 }
 
 #puzzle {
+    margin: 20px auto;
     width: 70vmin;
     height: 84vmin;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    border: 4px solid #7b2d3b;
+    border: 6px solid #ffffffaa;
+    border-radius: 15px;
     background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Puzzle pieces */
 .piece {
     background-image: url("puzzle.jpg");
     background-size: 500% 600%;
     cursor: grab;
 }
 
-/* Footer */
-.footer {
-    text-align: center;
-    padding: 15px;
+/* Bottom Message Section */
+.message-section {
+    padding: 20px 10px 40px;
+}
+
+.big-message {
+    font-size: 40px;
+    color: #b03060;
+    margin-bottom: 10px;
+}
+
+.small-sub {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #7b2d3b;
 }
 
 button {
-    padding: 12px 30px;
-    font-size: 16px;
-    background: #7b2d3b;
+    padding: 15px 40px;
+    font-size: 20px;
+    background: #d64f6a;
     color: white;
     border: none;
-    border-radius: 25px;
+    border-radius: 30px;
     cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 button:hover {
-    background: #5e1f2a;
+    background: #b03060;
 }
 
 /* Popup */
@@ -99,34 +99,29 @@ button:hover {
 
 .popup-content {
     background: white;
-    padding: 40px;
-    border-radius: 15px;
-    font-size: 28px;
-    color: #7b2d3b;
+    padding: 50px;
+    border-radius: 20px;
+    font-size: 30px;
+    color: #b03060;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    <h1>Happy Valentine’s Day</h1>
+<div class="banner">
+    <h1>Srishti ❤️</h1>
+    <div class="subtitle">Welcome to Our Love Story!</div>
 </div>
 
-<!-- Stickers -->
-<div class="sticker sticker1">❤️</div>
-<div class="sticker sticker2">🍫</div>
-<div class="sticker sticker3">🧸</div>
-<div class="sticker sticker4">🌹</div>
-<div class="sticker sticker5">💝</div>
-<div class="sticker sticker6">💖</div>
-
-<div class="main">
+<div class="puzzle-wrapper">
     <div id="puzzle"></div>
 </div>
 
-<div class="footer">
-    <button onclick="shuffle()">Shuffle</button>
+<div class="message-section">
+    <div class="big-message">You Complete Me!</div>
+    <div class="small-sub">Our Sweet Jigsaw Moment</div>
+    <button onclick="shuffle()">Shuffle Puzzle</button>
 </div>
 
 <div id="popup">
@@ -144,7 +139,6 @@ const cols = 5;
 const rows = 6;
 const total = cols * rows;
 
-/* Create puzzle correctly */
 function createPuzzle() {
     puzzle.innerHTML = "";
     pieces = [];
@@ -174,7 +168,6 @@ function createPuzzle() {
     shuffle();
 }
 
-/* Proper shuffle (no duplicates) */
 function shuffle() {
     const positions = pieces.map(p => p.dataset.correct);
 
@@ -213,6 +206,11 @@ function checkWin() {
 
     if (correct) {
         document.getElementById("popup").style.display = "flex";
+        confetti({
+            particleCount: 200,
+            spread: 120,
+            origin: { y: 0.6 }
+        });
     }
 }
 
