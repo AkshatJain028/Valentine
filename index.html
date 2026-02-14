@@ -24,7 +24,7 @@
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
             border: 4px solid white;
-            box-shadow: 0 0 20px #ff4d6d;
+            box-shadow: 0 0 25px #ff4d6d;
         }
 
         .piece {
@@ -36,18 +36,6 @@
             border: 1px solid white;
         }
 
-        .heart {
-            position: absolute;
-            color: white;
-            font-size: 20px;
-            animation: float 6s linear infinite;
-        }
-
-        @keyframes float {
-            from { transform: translateY(100vh); opacity: 1; }
-            to { transform: translateY(-10vh); opacity: 0; }
-        }
-
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -56,10 +44,28 @@
             color: white;
             border-radius: 10px;
             cursor: pointer;
+            margin: 5px;
         }
 
         button:hover {
             background: #e63950;
+        }
+
+        .heart {
+            position: absolute;
+            color: white;
+            animation: float 6s linear infinite;
+        }
+
+        @keyframes float {
+            from { transform: translateY(100vh); opacity: 1; }
+            to { transform: translateY(-10vh); opacity: 0; }
+        }
+
+        #message {
+            color: white;
+            font-size: 24px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -71,29 +77,77 @@
 <div class="puzzle-container" id="puzzle"></div>
 
 <button onclick="shuffle()">Shuffle</button>
+<button onclick="restartPuzzle()">Restart New Puzzle</button>
+
+<div id="message"></div>
 
 <script>
     const size = 8;
     const puzzle = document.getElementById("puzzle");
+    const message = document.getElementById("message");
     let pieces = [];
+    let selectedPiece = null;
 
     function createPuzzle() {
+        puzzle.innerHTML = "";
+        pieces = [];
+
         for (let row = 0; row < size; row++) {
             for (let col = 0; col < size; col++) {
                 const piece = document.createElement("div");
                 piece.classList.add("piece");
                 piece.style.backgroundPosition = `-${col * 60}px -${row * 60}px`;
                 piece.dataset.correct = row * size + col;
+                piece.addEventListener("click", () => selectPiece(piece));
                 pieces.push(piece);
                 puzzle.appendChild(piece);
             }
         }
     }
 
+    function selectPiece(piece) {
+        if (!selectedPiece) {
+            selectedPiece = piece;
+            piece.style.border = "2px solid red";
+        } else {
+            swapPieces(selectedPiece, piece);
+            selectedPiece.style.border = "1px solid white";
+            selectedPiece = null;
+            checkWin();
+        }
+    }
+
+    function swapPieces(p1, p2) {
+        const temp = p1.style.backgroundPosition;
+        p1.style.backgroundPosition = p2.style.backgroundPosition;
+        p2.style.backgroundPosition = temp;
+    }
+
     function shuffle() {
-        pieces.sort(() => Math.random() - 0.5);
-        puzzle.innerHTML = "";
-        pieces.forEach(piece => puzzle.appendChild(piece));
+        for (let i = pieces.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            swapPieces(pieces[i], pieces[j]);
+        }
+        message.innerHTML = "";
+    }
+
+    function checkWin() {
+        let correct = true;
+        pieces.forEach((piece, index) => {
+            if (piece.dataset.correct != index) {
+                correct = false;
+            }
+        });
+
+        if (correct) {
+            message.innerHTML = "💖 You Solved It! 💖";
+        }
+    }
+
+    function restartPuzzle() {
+        createPuzzle();
+        shuffle();
+        message.innerHTML = "";
     }
 
     function createHearts() {
@@ -104,10 +158,7 @@
             heart.style.left = Math.random() * window.innerWidth + "px";
             heart.style.fontSize = (Math.random() * 20 + 10) + "px";
             document.body.appendChild(heart);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 6000);
+            setTimeout(() => heart.remove(), 6000);
         }, 500);
     }
 
