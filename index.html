@@ -3,168 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Happy Valentine's Day ❤️</title>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<title>Heart-Shaped Valentine Jigsaw</title>
 <style>
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  text-align: center;
-  background: linear-gradient(#ffd6e7, #ffb6d9);
+    background: #ffd1dc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    text-align: center;
+    overflow: hidden;
 }
 
-h1 {
-  font-family: 'Pacifico', cursive;
-  font-size: 48px;
-  color: #d63384;
-  margin-top: 30px;
+.container {
+    max-width: 800px;
+    background: #ffe0e6;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 2;
 }
 
-.subtitle {
-  font-size: 20px;
-  margin-bottom: 10px;
-  color: #a61e4d;
+h1 { color: #d32f2f; font-size: 2.5rem; margin-bottom: 5px; }
+h2 { color: #b71c1c; margin: 10px 0; }
+p { color: #880e4f; margin: 5px 0 20px; }
+
+#puzzle {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    touch-action: none;
 }
 
-.status {
-  font-weight: 600;
-  color: #ff4d6d;
-  font-size: 22px;
-  margin-bottom: 15px;
+.piece {
+    position: absolute;
+    cursor: grab;
+    transition: all 0.2s ease;
+    touch-action: none;
+    clip-path: path('M50 15 C35 15, 25 35, 50 55 C75 35, 65 15, 50 15 Z');
+    background-size: cover;
+    border: 2px solid #fff;
+    box-sizing: border-box;
 }
 
-.puzzle-container {
-  width: 360px;
-  height: 360px;
-  margin: 20px auto;
-  position: relative;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+.heart {
+    position: absolute;
+    font-size: 24px;
+    color: red;
+    animation: pop 0.6s ease-out forwards;
+    pointer-events: none;
 }
 
-.tile {
-  width: 120px;
-  height: 120px;
-  position: absolute;
-  background-image: url('images/puzzle.jpg');
-  background-size: 360px 360px;
-  cursor: pointer;
-  box-sizing: border-box;
-  border: 1px solid #fff;
-  transition: all 0.2s ease;
+@keyframes pop {
+    0% { transform: scale(0.5); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
 }
 
-.empty {
-  background: white;
-  cursor: default;
-  border: none;
+@keyframes bounce {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
-button {
-  background: linear-gradient(45deg, #ff4d6d, #ff85a2);
-  border: none;
-  padding: 12px 28px;
-  border-radius: 30px;
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  margin: 20px;
+.button {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    background: #f06292;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.button:hover { background: #ec407a; }
+
+.footer { margin-top: 30px; }
+
+.falling-heart {
+    position: absolute;
+    font-size: 20px;
+    color: #ff4d6d;
+    pointer-events: none;
+    animation: fall linear infinite;
+    opacity: 0.8;
+    z-index: 1;
 }
 
-button:hover {
-  transform: scale(1.08);
+@keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
 
-.bottom-section {
-  background: linear-gradient(#ff9ec4, #ff85a2);
-  padding: 40px 20px;
-  color: white;
-  font-family: 'Pacifico', cursive;
-  font-size: 30px;
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 50%;
 }
 </style>
 </head>
 <body>
 
-<h1>Happy Valentine's Day ❤️</h1>
-<div class="subtitle">Welcome to Our Love Story!</div>
-<div class="status">Solve the Puzzle 💖</div>
+<div class="container">
+<h1>Happy Valentine's Day</h1>
+<h3>Welcome to Our Love Story!</h3>
 
-<div class="puzzle-container" id="puzzle"></div>
+<div id="puzzle"></div>
+<button id="shuffleBtn" class="button">Shuffle Puzzle</button>
 
-<button onclick="shuffle()">Shuffle Puzzle</button>
+<h2>You Complete Me!</h2>
+<p>Our Sweet Jigsaw Moment</p>
 
-<div class="bottom-section">
-  Forever & Always 💖
-  <p style="font-family:Poppins; font-size:18px;">With You, My Heart is Home</p>
+<div class="footer">
+<h3>Forever & Always</h3>
+<p>With You, My Heart is Home</p>
+</div>
 </div>
 
 <script>
-const puzzle = document.getElementById('puzzle');
-const size = 3;
-const tileSize = 120;
-let tiles = [];
-let emptyPos = {x: size-1, y: size-1};
+const puzzleContainer = document.getElementById('puzzle');
+const rows = 4;
+const cols = 5;
+const imgSrc = 'puzzle.jpg';
+let pieces = [];
+let pieceWidth, pieceHeight;
 
-function createPuzzle() {
-  tiles = [];
-  puzzle.innerHTML = '';
+const img = new Image();
+img.src = imgSrc;
+img.onload = () => {
+    pieceWidth = img.width / cols;
+    pieceHeight = img.height / rows;
+    puzzleContainer.style.width = img.width + 'px';
+    puzzleContainer.style.height = img.height + 'px';
+    createPieces();
+    drawPuzzle();
+};
 
-  for(let row=0; row<size; row++){
-    for(let col=0; col<size; col++){
-      if(row === size-1 && col === size-1) continue; // skip last tile
-
-      const tile = document.createElement('div');
-      tile.classList.add('tile');
-      tile.style.left = `${col*tileSize}px`;
-      tile.style.top = `${row*tileSize}px`;
-      tile.style.backgroundPosition = `-${col*tileSize}px -${row*tileSize}px`;
-
-      tile.dataset.row = row;
-      tile.dataset.col = col;
-
-      tile.addEventListener('click', ()=> moveTile(tile));
-
-      puzzle.appendChild(tile);
-      tiles.push(tile);
+function createPieces() {
+    pieces = [];
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+            pieces.push({
+                x: x * pieceWidth,
+                y: y * pieceHeight,
+                correctX: x * pieceWidth,
+                correctY: y * pieceHeight,
+                element: null
+            });
+        }
     }
-  }
 }
 
-function moveTile(tile) {
-  const tileRow = parseInt(tile.dataset.row);
-  const tileCol = parseInt(tile.dataset.col);
-
-  // check if adjacent to empty
-  if((tileRow === emptyPos.y && Math.abs(tileCol - emptyPos.x)===1) ||
-     (tileCol === emptyPos.x && Math.abs(tileRow - emptyPos.y)===1)) {
-
-    const tempLeft = tile.style.left;
-    const tempTop = tile.style.top;
-
-    tile.style.left = `${emptyPos.x*tileSize}px`;
-    tile.style.top = `${emptyPos.y*tileSize}px`;
-
-    emptyPos.x = tileCol;
-    emptyPos.y = tileRow;
-  }
-}
-
-function shuffle() {
-  for(let i=0; i<100; i++){
-    const movable = tiles.filter(t=>{
-      const r = parseInt(t.dataset.row);
-      const c = parseInt(t.dataset.col);
-      return (r === emptyPos.y && Math.abs(c-emptyPos.x)===1) || (c===emptyPos.x && Math.abs(r-emptyPos.y)===1);
+function drawPuzzle() {
+    puzzleContainer.innerHTML = '';
+    pieces.forEach(piece => {
+        const div = document.createElement('div');
+        div.classList.add('piece');
+        div.style.width = pieceWidth + 'px';
+        div.style.height = pieceHeight + 'px';
+        div.style.backgroundImage = `url(${imgSrc})`;
+        div.style.backgroundPosition = `-${piece.correctX}px -${piece.correctY}px`;
+        div.style.left = piece.x + 'px';
+        div.style.top = piece.y + 'px';
+        puzzleContainer.appendChild(div);
+        piece.element = div;
+        makeDraggable(div, piece);
     });
-    const tile = movable[Math.floor(Math.random()*movable.length)];
-    moveTile(tile);
-  }
 }
 
-createPuzzle();
-</script>
+function shufflePuzzle() {
+    pieces.forEach(piece => {
+        piece.x = Math.random() * (puzzleContainer.offsetWidth - pieceWidth);
+        piece.y = Math.random() * (puzzleContainer.offsetHeight - pieceHeight);
+        piece.element.style.left = piece.x + 'px';
+        piece.element.style.top = piece.y + 'px';
+    });
+}
+document.getElementById('shuffleBtn').addEventListener('click', shufflePuzzle);
 
+function makeDraggable(el, piece) {
+    let offsetX, offsetY, isDragging = false;
+
+    const startDrag = (e) => {
+        isDragging = true;
+        el.style.zIndex = 1000;
+        el.style.transform = 'rotate(5deg) scale(1.1,0.9)';
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        offsetX = clientX - el.offsetLeft;
+        offsetY = clientY - el.offsetTop;
+        e.preventDefault();
+    };
+
+    const onDrag = (e) => {
+        if (!isDragging) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        piece.x = clientX - offsetX;
+        piece.y = clientY - offsetY;
+        el.style.left = piece.x + 'px';
+        el.style.top = piece.y + 'px';
+
+        // Heart trail
+        createTrailHeart(clientX, clientY);
+    };
+
+    const endDrag = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        el.style.zIndex = 1;
+        el.style.transform = 'rotate(0deg) scale(1,1)';
+
+        if (Math.abs(piece.x - piece.correctX) < 20 && Math.abs(piece.y - piece.correctY) < 20) {
+            piece.x = piece.correctX;
+            piece.y = piece.correctY;
+            el.style.left = piece.x + 'px';
+            el.style.top = piece.y + 'px';
+            el.style.animation = 'bounce 0.4s ease';
+            setTimeout(() => el.style.animation = '', 400);
+            showHeart(piece.x + pieceWidth/2, piece.y + pieceHeight/2);
+        }
+        checkWin();
+    };
+
+    el.addEventListener('mousedown', startDrag);
+    el.addEventListener('touchstart', startDrag);
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('touchmove', onDrag);
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+}
+
+function showHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
+    puzzleContainer.appendChild(heart);
+    setTimeout(() => heart.remove(), 600);
+}
+
+function createTrailHeart(x, y) {
+    const trail = document.createElement('div');
+    trail.classList.add('heart');
+    trail.style.fontSize = (12 + Math.random()*10)+'px';
+    trail.style.left = x + 'px';
+    trail.style.top = y + 'px';
+    trail.style.opacity = 0.7;
+    document.body.appendChild(trail);
+    setTimeout(() => trail.remove(), 600);
+}
+
+function createFallingHearts() {
+    for(let i=0;i<20;i++){
+        const heart = document.createElement('div');
+        heart.classList.add('falling-heart');
+        heart.style.left = Math.random()*window.innerWidth+'px';
+        heart.style.animationDuration = (3 + Math.random()*3)+'s';
+        heart.style.fontSize = (15 + Math.random()*20)+'px';
+        heart.innerText = '❤️';
+        document.body.appendChild(heart);
+    }
+}
+createFallingHearts();
+setInterval(createFallingHearts, 4000);
+
+function showConfetti() {
+    for(let i=0;i<100;i++){
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random()*window.innerWidth+'px';
+        confetti.style.background = `hsl(${Math.random()*360}, 70%, 50%)`;
+        document.body.appendChild(confetti);
+        const duration = 2000 + Math.random()*2000;
+        confetti.animate([{transform: 'translateY(0px)'},{transform: `translateY(${window.innerHeight}px)`}], {duration: duration, iterations:1, easing:'linear'});
+        setTimeout(()=>confetti.remove(), duration);
+    }
+}
+
+function checkWin() {
+    const solved = pieces.every(p => p.x === p.correctX && p.y === p.correctY);
+    if (solved) {
+        pieces.forEach(p => p.element.style.borderColor = '#f06292');
+        showConfetti();
+        alert('🎉 Congratulations! You completed the heart puzzle! 🎉');
+    }
+}
+</script>
 </body>
 </html>
