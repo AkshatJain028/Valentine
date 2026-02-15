@@ -16,7 +16,6 @@ body {
     text-align: center;
     overflow: hidden;
 }
-
 .container {
     max-width: 800px;
     background: #ffe0e6;
@@ -26,11 +25,9 @@ body {
     position: relative;
     z-index: 2;
 }
-
 h1 { color: #d32f2f; font-size: 2.5rem; margin-bottom: 5px; }
 h2 { color: #b71c1c; margin: 10px 0; }
 p { color: #880e4f; margin: 5px 0 20px; }
-
 #puzzle {
     position: relative;
     width: 100%;
@@ -41,7 +38,6 @@ p { color: #880e4f; margin: 5px 0 20px; }
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
     touch-action: none;
 }
-
 .piece {
     position: absolute;
     cursor: grab;
@@ -52,7 +48,6 @@ p { color: #880e4f; margin: 5px 0 20px; }
     border: 2px solid #fff;
     box-sizing: border-box;
 }
-
 .heart {
     position: absolute;
     font-size: 24px;
@@ -60,19 +55,16 @@ p { color: #880e4f; margin: 5px 0 20px; }
     animation: pop 0.6s ease-out forwards;
     pointer-events: none;
 }
-
 @keyframes pop {
     0% { transform: scale(0.5); opacity: 1; }
     50% { transform: scale(1.5); opacity: 1; }
     100% { transform: scale(1); opacity: 0; }
 }
-
 @keyframes bounce {
     0% { transform: scale(0.8); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
-
 .button {
     padding: 10px 25px;
     font-size: 1rem;
@@ -84,9 +76,7 @@ p { color: #880e4f; margin: 5px 0 20px; }
     transition: 0.3s;
 }
 .button:hover { background: #ec407a; }
-
 .footer { margin-top: 30px; }
-
 .falling-heart {
     position: absolute;
     font-size: 20px;
@@ -96,13 +86,11 @@ p { color: #880e4f; margin: 5px 0 20px; }
     opacity: 0.8;
     z-index: 1;
 }
-
 @keyframes fall {
     0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
     50% { opacity: 1; }
     100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
-
 .confetti {
     position: absolute;
     width: 10px;
@@ -133,12 +121,14 @@ p { color: #880e4f; margin: 5px 0 20px; }
 </div>
 
 <script>
+// Use the uploaded puzzle.jpg in the same repo
+const imgSrc = 'puzzle.jpg';
+
 const puzzleContainer = document.getElementById('puzzle');
 const rows = 4;
 const cols = 5;
-const imgSrc = 'puzzle.jpg';
 let pieces = [];
-let pieceWidth, pieceHeight;
+let pieceWidth = 100, pieceHeight = 100;
 
 const img = new Image();
 img.src = imgSrc;
@@ -153,13 +143,13 @@ img.onload = () => {
 
 function createPieces() {
     pieces = [];
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
+    for (let y=0; y<rows; y++){
+        for (let x=0; x<cols; x++){
             pieces.push({
-                x: x * pieceWidth,
-                y: y * pieceHeight,
-                correctX: x * pieceWidth,
-                correctY: y * pieceHeight,
+                x: x*pieceWidth,
+                y: y*pieceHeight,
+                correctX: x*pieceWidth,
+                correctY: y*pieceHeight,
                 element: null
             });
         }
@@ -168,135 +158,133 @@ function createPieces() {
 
 function drawPuzzle() {
     puzzleContainer.innerHTML = '';
-    pieces.forEach(piece => {
+    pieces.forEach(piece=>{
         const div = document.createElement('div');
         div.classList.add('piece');
-        div.style.width = pieceWidth + 'px';
-        div.style.height = pieceHeight + 'px';
+        div.style.width = pieceWidth+'px';
+        div.style.height = pieceHeight+'px';
         div.style.backgroundImage = `url(${imgSrc})`;
         div.style.backgroundPosition = `-${piece.correctX}px -${piece.correctY}px`;
-        div.style.left = piece.x + 'px';
-        div.style.top = piece.y + 'px';
+        div.style.left = piece.x+'px';
+        div.style.top = piece.y+'px';
         puzzleContainer.appendChild(div);
         piece.element = div;
         makeDraggable(div, piece);
     });
 }
 
-function shufflePuzzle() {
-    pieces.forEach(piece => {
-        piece.x = Math.random() * (puzzleContainer.offsetWidth - pieceWidth);
-        piece.y = Math.random() * (puzzleContainer.offsetHeight - pieceHeight);
-        piece.element.style.left = piece.x + 'px';
-        piece.element.style.top = piece.y + 'px';
+function shufflePuzzle(){
+    pieces.forEach(piece=>{
+        piece.x = Math.random()*(puzzleContainer.offsetWidth-pieceWidth);
+        piece.y = Math.random()*(puzzleContainer.offsetHeight-pieceHeight);
+        piece.element.style.left = piece.x+'px';
+        piece.element.style.top = piece.y+'px';
     });
 }
 document.getElementById('shuffleBtn').addEventListener('click', shufflePuzzle);
 
-function makeDraggable(el, piece) {
-    let offsetX, offsetY, isDragging = false;
+function makeDraggable(el, piece){
+    let offsetX, offsetY, isDragging=false;
 
-    const startDrag = (e) => {
-        isDragging = true;
-        el.style.zIndex = 1000;
-        el.style.transform = 'rotate(5deg) scale(1.1,0.9)';
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        offsetX = clientX - el.offsetLeft;
-        offsetY = clientY - el.offsetTop;
+    const startDrag = e=>{
+        isDragging=true;
+        el.style.zIndex=1000;
+        el.style.transform='rotate(5deg) scale(1.1,0.9)';
+        const clientX=e.touches? e.touches[0].clientX : e.clientX;
+        const clientY=e.touches? e.touches[0].clientY : e.clientY;
+        offsetX=clientX-el.offsetLeft;
+        offsetY=clientY-el.offsetTop;
         e.preventDefault();
     };
 
-    const onDrag = (e) => {
-        if (!isDragging) return;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        piece.x = clientX - offsetX;
-        piece.y = clientY - offsetY;
-        el.style.left = piece.x + 'px';
-        el.style.top = piece.y + 'px';
-
-        // Heart trail
+    const onDrag = e=>{
+        if(!isDragging) return;
+        const clientX=e.touches? e.touches[0].clientX : e.clientX;
+        const clientY=e.touches? e.touches[0].clientY : e.clientY;
+        piece.x = clientX-offsetX;
+        piece.y = clientY-offsetY;
+        el.style.left = piece.x+'px';
+        el.style.top = piece.y+'px';
         createTrailHeart(clientX, clientY);
     };
 
-    const endDrag = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        el.style.zIndex = 1;
-        el.style.transform = 'rotate(0deg) scale(1,1)';
+    const endDrag = ()=>{
+        if(!isDragging) return;
+        isDragging=false;
+        el.style.zIndex=1;
+        el.style.transform='rotate(0deg) scale(1,1)';
 
-        if (Math.abs(piece.x - piece.correctX) < 20 && Math.abs(piece.y - piece.correctY) < 20) {
-            piece.x = piece.correctX;
-            piece.y = piece.correctY;
-            el.style.left = piece.x + 'px';
-            el.style.top = piece.y + 'px';
-            el.style.animation = 'bounce 0.4s ease';
-            setTimeout(() => el.style.animation = '', 400);
-            showHeart(piece.x + pieceWidth/2, piece.y + pieceHeight/2);
+        if(Math.abs(piece.x-piece.correctX)<20 && Math.abs(piece.y-piece.correctY)<20){
+            piece.x=piece.correctX;
+            piece.y=piece.correctY;
+            el.style.left=piece.x+'px';
+            el.style.top=piece.y+'px';
+            el.style.animation='bounce 0.4s ease';
+            setTimeout(()=>el.style.animation='',400);
+            showHeart(piece.x+pieceWidth/2,piece.y+pieceHeight/2);
         }
         checkWin();
     };
 
-    el.addEventListener('mousedown', startDrag);
-    el.addEventListener('touchstart', startDrag);
-    window.addEventListener('mousemove', onDrag);
-    window.addEventListener('touchmove', onDrag);
-    window.addEventListener('mouseup', endDrag);
-    window.addEventListener('touchend', endDrag);
+    el.addEventListener('mousedown',startDrag);
+    el.addEventListener('touchstart',startDrag);
+    window.addEventListener('mousemove',onDrag);
+    window.addEventListener('touchmove',onDrag);
+    window.addEventListener('mouseup',endDrag);
+    window.addEventListener('touchend',endDrag);
 }
 
-function showHeart(x, y) {
-    const heart = document.createElement('div');
+function showHeart(x,y){
+    const heart=document.createElement('div');
     heart.classList.add('heart');
-    heart.style.left = x + 'px';
-    heart.style.top = y + 'px';
+    heart.style.left=x+'px';
+    heart.style.top=y+'px';
     puzzleContainer.appendChild(heart);
-    setTimeout(() => heart.remove(), 600);
+    setTimeout(()=>heart.remove(),600);
 }
 
-function createTrailHeart(x, y) {
-    const trail = document.createElement('div');
+function createTrailHeart(x,y){
+    const trail=document.createElement('div');
     trail.classList.add('heart');
-    trail.style.fontSize = (12 + Math.random()*10)+'px';
-    trail.style.left = x + 'px';
-    trail.style.top = y + 'px';
-    trail.style.opacity = 0.7;
+    trail.style.fontSize=(12+Math.random()*10)+'px';
+    trail.style.left=x+'px';
+    trail.style.top=y+'px';
+    trail.style.opacity=0.7;
     document.body.appendChild(trail);
-    setTimeout(() => trail.remove(), 600);
+    setTimeout(()=>trail.remove(),600);
 }
 
-function createFallingHearts() {
+function createFallingHearts(){
     for(let i=0;i<20;i++){
-        const heart = document.createElement('div');
+        const heart=document.createElement('div');
         heart.classList.add('falling-heart');
-        heart.style.left = Math.random()*window.innerWidth+'px';
-        heart.style.animationDuration = (3 + Math.random()*3)+'s';
-        heart.style.fontSize = (15 + Math.random()*20)+'px';
-        heart.innerText = '❤️';
+        heart.style.left=Math.random()*window.innerWidth+'px';
+        heart.style.animationDuration=(3+Math.random()*3)+'s';
+        heart.style.fontSize=(15+Math.random()*20)+'px';
+        heart.innerText='❤️';
         document.body.appendChild(heart);
     }
 }
 createFallingHearts();
-setInterval(createFallingHearts, 4000);
+setInterval(createFallingHearts,4000);
 
-function showConfetti() {
+function showConfetti(){
     for(let i=0;i<100;i++){
-        const confetti = document.createElement('div');
+        const confetti=document.createElement('div');
         confetti.classList.add('confetti');
-        confetti.style.left = Math.random()*window.innerWidth+'px';
-        confetti.style.background = `hsl(${Math.random()*360}, 70%, 50%)`;
+        confetti.style.left=Math.random()*window.innerWidth+'px';
+        confetti.style.background=`hsl(${Math.random()*360},70%,50%)`;
         document.body.appendChild(confetti);
-        const duration = 2000 + Math.random()*2000;
-        confetti.animate([{transform: 'translateY(0px)'},{transform: `translateY(${window.innerHeight}px)`}], {duration: duration, iterations:1, easing:'linear'});
-        setTimeout(()=>confetti.remove(), duration);
+        const duration=2000+Math.random()*2000;
+        confetti.animate([{transform:'translateY(0px)'},{transform:`translateY(${window.innerHeight}px)`}],{duration:duration,iterations:1,easing:'linear'});
+        setTimeout(()=>confetti.remove(),duration);
     }
 }
 
-function checkWin() {
-    const solved = pieces.every(p => p.x === p.correctX && p.y === p.correctY);
-    if (solved) {
-        pieces.forEach(p => p.element.style.borderColor = '#f06292');
+function checkWin(){
+    const solved=pieces.every(p=>p.x===p.correctX && p.y===p.correctY);
+    if(solved){
+        pieces.forEach(p=>p.element.style.borderColor='#f06292');
         showConfetti();
         alert('🎉 Congratulations! You completed the heart puzzle! 🎉');
     }
