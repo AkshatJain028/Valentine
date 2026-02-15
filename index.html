@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valentine Puzzle</title>
+<title>Valentine Puzzle Swap</title>
 <style>
 body {
     background: #ffd1dc;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
     text-align: center;
+    overflow-x: hidden;
 }
 .container {
-    max-width: 90%;
+    max-width: 95%;
     margin-top: 20px;
 }
 h1 { color: #d32f2f; font-size: 2rem; margin: 0; }
@@ -27,14 +28,14 @@ h3 { color: #880e4f; margin: 5px 0 15px; }
     margin: 0 auto;
     background: #fff;
     border-radius: 10px;
-    touch-action: none;
 }
 .piece {
     position: absolute;
-    cursor: grab;
     border: 2px solid #fff;
     box-sizing: border-box;
     background-size: cover;
+    cursor: grab;
+    transition: transform 0.2s;
 }
 .button {
     margin-top: 15px;
@@ -44,6 +45,44 @@ h3 { color: #880e4f; margin: 5px 0 15px; }
     background: #f06292;
     color: #fff;
     cursor: pointer;
+}
+/* Heart trail */
+.heart {
+    position: absolute;
+    font-size: 18px;
+    color: red;
+    pointer-events: none;
+    animation: pop 0.6s ease-out forwards;
+}
+@keyframes pop {
+    0% { transform: scale(0.5); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
+/* Falling hearts */
+.falling-heart {
+    position: absolute;
+    font-size: 20px;
+    color: #ff4d6d;
+    pointer-events: none;
+    animation: fall linear infinite;
+    opacity: 0.8;
+    z-index: 1;
+}
+@keyframes fall {
+    0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+/* Confetti */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 50%;
 }
 </style>
 </head>
@@ -57,120 +96,196 @@ h3 { color: #880e4f; margin: 5px 0 15px; }
 </div>
 
 <script>
-// Settings
 const rows = 4;
 const cols = 5;
 const imgSrc = 'puzzle.jpg'; // Your uploaded image
 let pieces = [];
+let pieceWidth, pieceHeight;
+let puzzleWidth, puzzleHeight;
 const puzzleContainer = document.getElementById('puzzle');
 
 const img = new Image();
 img.src = imgSrc;
 img.onload = () => {
-    // Scale image to fit screen width
-    const maxWidth = Math.min(img.width, window.innerWidth * 0.9);
+    const maxWidth = Math.min(img.width, window.innerWidth*0.95);
     const scale = maxWidth / img.width;
-    const puzzleWidth = img.width * scale;
-    const puzzleHeight = img.height * scale;
-    puzzleContainer.style.width = puzzleWidth + 'px';
-    puzzleContainer.style.height = puzzleHeight + 'px';
+    puzzleWidth = img.width*scale;
+    puzzleHeight = img.height*scale;
+    puzzleContainer.style.width = puzzleWidth+'px';
+    puzzleContainer.style.height = puzzleHeight+'px';
 
-    const pieceWidth = puzzleWidth / cols;
-    const pieceHeight = puzzleHeight / rows;
+    pieceWidth = puzzleWidth/cols;
+    pieceHeight = puzzleHeight/rows;
 
-    // Create pieces
-    pieces = [];
-    for (let y=0; y<rows; y++){
-        for (let x=0; x<cols; x++){
-            const piece = {
-                correctX: x*pieceWidth,
-                correctY: y*pieceHeight,
-                x: x*pieceWidth,
-                y: y*pieceHeight,
-                element: null,
-                width: pieceWidth,
-                height: pieceHeight
-            };
-            pieces.push(piece);
-        }
-    }
-
+    initPieces();
     drawPuzzle();
 };
 
+// Initialize puzzle pieces
+function initPieces(){
+    pieces = [];
+    for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+            pieces.push({
+                row: r,
+                col: c,
+                correctRow: r,
+                correctCol: c,
+                element: null
+            });
+        }
+    }
+}
+
+// Draw pieces
 function drawPuzzle(){
-    puzzleContainer.innerHTML = '';
-    pieces.forEach(piece => {
-        const div = document.createElement('div');
+    puzzleContainer.innerHTML='';
+    pieces.forEach(p=>{
+        const div=document.createElement('div');
         div.classList.add('piece');
-        div.style.width = piece.width+'px';
-        div.style.height = piece.height+'px';
-        div.style.left = piece.x+'px';
-        div.style.top = piece.y+'px';
-        div.style.backgroundImage = `url(${imgSrc})`;
-        div.style.backgroundSize = `${puzzleContainer.offsetWidth}px ${puzzleContainer.offsetHeight}px`;
-        div.style.backgroundPosition = `-${piece.correctX}px -${piece.correctY}px`;
+        div.style.width=pieceWidth+'px';
+        div.style.height=pieceHeight+'px';
+        div.style.left=p.col*pieceWidth+'px';
+        div.style.top=p.row*pieceHeight+'px';
+        div.style.backgroundImage=`url(${imgSrc})`;
+        div.style.backgroundSize=`${puzzleWidth}px ${puzzleHeight}px`;
+        div.style.backgroundPosition=`-${p.correctCol*pieceWidth}px -${p.correctRow*pieceHeight}px`;
         puzzleContainer.appendChild(div);
-        piece.element = div;
-        makeDraggable(div, piece);
+        p.element=div;
+
+        makeSwappable(div,p);
     });
 }
 
+// Swap logic
+let draggedPiece = null;
+
+function makeSwappable(el, piece){
+    el.draggable=false;
+
+    el.addEventListener('mousedown', startDrag);
+    el.addEventListener('touchstart', startDrag);
+
+    function startDrag(e){
+        e.preventDefault();
+        draggedPiece = piece;
+        el.style.opacity = 0.7;
+
+        window.addEventListener('mousemove', dragMove);
+        window.addEventListener('touchmove', dragMove);
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+    }
+
+    function dragMove(e){
+        if(!draggedPiece) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const rect = puzzleContainer.getBoundingClientRect();
+        const x = clientX - rect.left - pieceWidth/2;
+        const y = clientY - rect.top - pieceHeight/2;
+        draggedPiece.element.style.transform=`translate(${x - draggedPiece.col*pieceWidth}px, ${y - draggedPiece.row*pieceHeight}px)`;
+
+        // Create heart trail
+        const heart=document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left=clientX+'px';
+        heart.style.top=clientY+'px';
+        heart.innerText='❤️';
+        document.body.appendChild(heart);
+        setTimeout(()=>heart.remove(),600);
+    }
+
+    function endDrag(e){
+        if(!draggedPiece) return;
+        const rect = puzzleContainer.getBoundingClientRect();
+        const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+        const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+        const col = Math.min(Math.floor((clientX - rect.left)/pieceWidth), cols-1);
+        const row = Math.min(Math.floor((clientY - rect.top)/pieceHeight), rows-1);
+
+        const targetPiece = pieces.find(p=>p.row===row && p.col===col);
+        if(targetPiece && targetPiece!==draggedPiece){
+            const tempRow = draggedPiece.row;
+            const tempCol = draggedPiece.col;
+            draggedPiece.row = targetPiece.row;
+            draggedPiece.col = targetPiece.col;
+            targetPiece.row = tempRow;
+            targetPiece.col = tempCol;
+        }
+
+        pieces.forEach(p=>{
+            p.element.style.transition='transform 0.2s, left 0.2s, top 0.2s';
+            p.element.style.left = p.col*pieceWidth+'px';
+            p.element.style.top = p.row*pieceHeight+'px';
+            p.element.style.transform='translate(0,0)';
+        });
+
+        draggedPiece.element.style.opacity=1;
+        draggedPiece=null;
+        checkWin();
+
+        window.removeEventListener('mousemove', dragMove);
+        window.removeEventListener('touchmove', dragMove);
+        window.removeEventListener('mouseup', endDrag);
+        window.removeEventListener('touchend', endDrag);
+    }
+}
+
+// Shuffle pieces
 function shufflePuzzle(){
-    pieces.forEach(piece=>{
-        piece.x = Math.random()*(puzzleContainer.offsetWidth-piece.width);
-        piece.y = Math.random()*(puzzleContainer.offsetHeight-piece.height);
-        piece.element.style.left = piece.x+'px';
-        piece.element.style.top = piece.y+'px';
+    for(let i=0;i<100;i++){
+        const a=Math.floor(Math.random()*pieces.length);
+        const b=Math.floor(Math.random()*pieces.length);
+        const tempRow = pieces[a].row;
+        const tempCol = pieces[a].col;
+        pieces[a].row = pieces[b].row;
+        pieces[a].col = pieces[b].col;
+        pieces[b].row = tempRow;
+        pieces[b].col = tempCol;
+    }
+    pieces.forEach(p=>{
+        p.element.style.left = p.col*pieceWidth+'px';
+        p.element.style.top = p.row*pieceHeight+'px';
+        p.element.style.transform='translate(0,0)';
     });
 }
 document.getElementById('shuffleBtn').addEventListener('click', shufflePuzzle);
 
-function makeDraggable(el, piece){
-    let offsetX, offsetY, dragging=false;
-    const start = e=>{
-        dragging=true;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        offsetX = clientX - el.offsetLeft;
-        offsetY = clientY - el.offsetTop;
-        el.style.zIndex = 1000;
-    };
-    const move = e=>{
-        if(!dragging) return;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        piece.x = clientX - offsetX;
-        piece.y = clientY - offsetY;
-        el.style.left = piece.x+'px';
-        el.style.top = piece.y+'px';
-    };
-    const end = ()=>{
-        dragging=false;
-        el.style.zIndex = 1;
-        // Snap to correct position if close
-        if(Math.abs(piece.x-piece.correctX)<20 && Math.abs(piece.y-piece.correctY)<20){
-            piece.x = piece.correctX;
-            piece.y = piece.correctY;
-            el.style.left = piece.x+'px';
-            el.style.top = piece.y+'px';
-        }
-        checkWin();
-    };
-    el.addEventListener('mousedown', start);
-    el.addEventListener('touchstart', start);
-    window.addEventListener('mousemove', move);
-    window.addEventListener('touchmove', move);
-    window.addEventListener('mouseup', end);
-    window.addEventListener('touchend', end);
+// Falling hearts background
+function createFallingHearts(){
+    const heart=document.createElement('div');
+    heart.classList.add('falling-heart');
+    heart.style.left=Math.random()*window.innerWidth+'px';
+    heart.style.fontSize=(15+Math.random()*20)+'px';
+    heart.innerText='❤️';
+    document.body.appendChild(heart);
+    heart.addEventListener('animationend',()=>heart.remove());
+}
+setInterval(createFallingHearts,500);
+
+// Confetti
+function showConfetti(){
+    for(let i=0;i<100;i++){
+        const c=document.createElement('div');
+        c.classList.add('confetti');
+        c.style.left=Math.random()*window.innerWidth+'px';
+        c.style.background=`hsl(${Math.random()*360},70%,50%)`;
+        document.body.appendChild(c);
+        const duration=2000+Math.random()*2000;
+        c.animate([{transform:'translateY(0)'},{transform:`translateY(${window.innerHeight}px)`}],{duration:duration,iterations:1,easing:'linear'});
+        setTimeout(()=>c.remove(),duration);
+    }
 }
 
+// Check win
 function checkWin(){
-    if(pieces.every(p=>p.x===p.correctX && p.y===p.correctY)){
+    if(pieces.every(p=>p.row===p.correctRow && p.col===p.correctCol)){
+        showConfetti();
         alert('🎉 Congratulations! You completed the puzzle! 🎉');
     }
 }
 </script>
-
 </body>
 </html>
